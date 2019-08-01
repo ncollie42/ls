@@ -6,6 +6,7 @@
 #include <time.h>
 #include <sys/xattr.h>
 #include <strings.h>
+# include <sys/ioctl.h>
 #include <unistd.h> // getuid
 #define FLAG(x) flag[x - 'a']
 char flag[20];
@@ -20,7 +21,10 @@ int main(int argc, char **argv)
     struct stat fileInfo;
     struct passwd *pswd;
     struct group *grp;
+    struct winsize	w;
 
+	ioctl(0, TIOCGWINSZ, &w);    
+    printf("col: %hu\trow: %hu\n",w.ws_col, w.ws_row);
     test = opendir(".");
     
     char *pname;
@@ -58,7 +62,8 @@ int main(int argc, char **argv)
             // printf("%d\t", fileInfo.st_blksize);
             printf("%lld\t", fileInfo.st_blocks);
             time1 = ctime(&fileInfo.st_mtimespec.tv_sec);
-            printf("%s\t\n", time1);
+            printf("%s\t", dirent->d_name);
+            printf("%s", time1);
             pswd = getpwuid(fileInfo.st_uid);
             // printf("%d\n", pswd. );
 
