@@ -1,66 +1,118 @@
 #include "header.h"
-#include "nc_lib.h"
-#define FLAGUSAGE  "usage: ls [-atlrR] [file ...]"
-flags g_flag;
 
 
-void    setFunction(void)
+extern flags g_flag;
+
+
+void    setFunctions(void)
 {
-    // if (g_flag.l) {
-
-    // } else {
-
-    // }
-    // if (g_flag.r)
-}
-
-void    parseFlag(char *arg)
-{
-    int n;
-    
-    n = 0;
-    while(arg[++n])
-    {
-        if (arg[n] == 'a')
-            g_flag.a = TRUE;
-        else if (arg[n] == 't')
-            g_flag.t = TRUE;
-        else if (arg[n] == 'r')
-            g_flag.r = TRUE;
-        else if (arg[n] == 'R')
-            g_flag.R = TRUE;
-        else if (arg[n] == 'l')
-            g_flag.l = TRUE;
-        else {
-            printf("ls: illegal option -- %c\n%s", arg[n], FLAGUSAGE);
-            exit(EXIT_FAILURE);
-        } 
+    if (g_flag.l) {
+        makeFileString = fileLongMake;
+        printDir = printLong; 
+    } else {
+        makeFileString = fileShortMake;
+        printDir = printShort;
     }
-}
-
-char **parseArgs(char **args)
-{
-    int n;
-
-    n = 0;
-    while(args[++n])
+    if (g_flag.r)
     {
-        if (args[n][0] == '-' && nc_strlen(args[n]) > 1)
-            parseFlag(args[n]);
+        if (g_flag.t)
+            compare = byTimeRev;
         else
-            return(&args[n]);
+            compare = byNameRev;
     }
-    args[0][0] = '.';
-    args[0][1] = '\0';
-    args[1] = NULL;
-    return NULL;
+    else if (g_flag.t)
+        compare = byTime;
+    else
+        compare = byName;
 }
+
+fileInfo *makeInfoStruct(struct dirent *dirent)
+{
+    struct stat statInfo;
+    struct passwd *pswd;
+    struct group *grp;
+    fileInfo *file;
+
+
+    lstat(dirent->d_name, &statInfo);
+    pswd = getpwuid(statInfo.st_uid);
+    grp = getgrgid(statInfo.st_gid);
+
+    file = malloc(sizeof(fileInfo));
+    file->mode = statInfo.st_mode;
+    file->nlink = statInfo.st_nlink;
+    file->pname = pswd->pw_name;
+    file->gname = grp->gr_name;
+    file->size = statInfo.st_size;
+    file->block = statInfo.st_blocks;
+    file->time = ctime(&statInfo.st_mtimespec.tv_sec);
+    file->seconds = statInfo.st_mtimespec.tv_sec;
+    file->nano = statInfo.st_mtimespec.tv_nsec;
+    file->name = strdup(dirent->d_name);
+    return file;
+}
+
+
+t_list **readDir(char *dirname) {
+    DIR             *dir;
+    struct dirent   *dirent;
+    t_list          **head;
+    t_list          *node;
+
+    head = malloc(sizeof(char *));
+    *head = NULL;
+    dir = opendir(dirname);
+    while ((dirent = readdir(dir)))
+    {
+        if (g_flag.a || dirent->d_name[0] != '.' )
+        {
+            node = newNode(makeInfoStruct(dirent));
+            lstAddSorted(head, node, compare);
+        }
+    }
+    closedir(dir);
+    return head;
+}
+
+
+t_list **handleDir(t_list **files)
+{
+    int     total;
+    t_list  *file;
+    t_list  **strings;
+    t_list  *node;
+    total = 0;
+
+    
+    strings = malloc(sizeof(t_list *)); // Don't need?
+    *strings = NULL;
+    file = *files;//itter - make strings? iiter print?
+    while(file)
+    {
+        total += ((fileInfo *)file->content)->block;
+        node = newNode(makeFileString(file));
+        append(strings, node);
+        /* if recursive que que going -- return queue */
+        file = file->next;
+    }
+    /* print dir */
+    printDir(strings);
+    /* free **files */
+    return files;
+}
+
 
 int main(int argc, char **argv)
 {
     argv = parseArgs(argv);
+    setFunctions();
 
-    // setFunctions();
+    t_list **files = readDir(".");
+    t_list **queue = handleDir(files);
+
+    // print test function 
+    printFiles(files);
+
     // sort(argv);
     // seperate_arguments splitArgs
     // printTrash()
