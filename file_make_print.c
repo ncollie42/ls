@@ -19,7 +19,8 @@ char    *fileShortMake(t_list *file)
 {
 	char *buffer;
 
-	buffer = malloc(sizeof(char) * 255);
+	buffer = malloc(sizeof(char) * 255);//change size
+	memset(buffer, '\0', 255);
     sprintf(buffer, "%s", ((char *)((fileInfo *)file->content)->name));
 	return buffer;
 }

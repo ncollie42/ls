@@ -74,7 +74,10 @@ t_list **readDir(char *dirname) {
     return head;
 }
 
-
+/* 
+    Arg: list of files for curent directory
+    return: if recursive, a queue of directory
+*/
 t_list **handleDir(t_list **files)
 {
     int     total;
