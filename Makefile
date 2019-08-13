@@ -1,8 +1,10 @@
 CC = gcc
 FILES = main.c \
 sorting.c \
+delete.c \
 flags.c \
 file_make_print.c \
+path.c \
 test_file2.c
 NAME = ls
 FLAGS = -g -fsanitize=address -Wall -Wextra
@@ -11,7 +13,7 @@ NC_LIB_BUFFER =  -L $(LIBRARY_PATH)/buffers -I $(LIBRARY_PATH)/buffers -lbuffer
 all: $(NAME)
 
 $(NAME): $(FILES)
-	$(CC) $(FLAGS) $(FILES) -o $@ $(NC_LIB_STANDARD) $(NC_LIB_BUFFER)
+	$(CC) -g $(FILES) -o $@ $(NC_LIB_STANDARD) $(NC_LIB_BUFFER)
 
 clean:
 	rm $(NAME)

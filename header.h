@@ -55,6 +55,18 @@ int     byTime(void *one, void *two);
 int     byTimeRev(void *one, void *two);
 int     (*compare)(void*,void*);
 
+/* path */
+
+char    *joinPath(char *s1, char *s2);
+
+/* deleting */
+
+ void delStrings(void *str);
+
+/* Dirs */
+
+void    walk(char *path);
+
 /* flags */
 
 char **parseArgs(char **args);
@@ -66,7 +78,7 @@ typedef struct s_flags
     int t:1;
     int R:1;
 }flags;
-enum Bool{FLASE, TRUE};
+enum Bool{FALSE, TRUE};
 
 flags g_flag;
 
