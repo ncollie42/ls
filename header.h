@@ -72,7 +72,7 @@ char *getLink(char *path);
 
 /* Dirs */
 
-void    walk(char *path);
+void    walk(t_list *curent);
 
 /* flags */
 

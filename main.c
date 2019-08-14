@@ -89,6 +89,7 @@ static int isDots(t_list *file)
     Arg: list of files for curent directory
     return: if recursive, a queue of directory
 */
+
 t_list **handleDir(t_list **files)
 {
     int         total;
@@ -105,50 +106,46 @@ t_list **handleDir(t_list **files)
         total += GETBLOCKS(file);
         append(strings, newNode(makeFileString(file)));
         if (g_flag.R && ISDIR(file) && !isDots(file))
-            append(queue, newNode(strdup((GETNAME(file)))));
+            append(queue, newNode(file->content));    //newNode makes it break less? (This file already has a next...) Need to make a copy with the contents of this one -- later need to mememove?
         file = file->next;
     }
-    printDir(strings);
+    printDir(strings);  //Pass total
     lstdel(strings, delStrings);
     return queue;
 }
 
 
 
-void    recurse(char *curentPath, t_list **dirName)
+void    recurse(t_list **queue)
 {
     t_list  *curent;
-    char    *newPath;
 
-    curent = *dirName;
+    curent = *queue;
     while (curent)
     {
-        newPath = joinPath(curentPath, (char *)curent->content);
-        printf("\n%s:\n", newPath);
-        walk(newPath);
-        free(newPath);
+        printf("\n%s:\n", ((fileInfo *)curent->content)->path); 
+        walk(curent);
         curent = curent->next;
     }
 }
 
-void    walk(char *path)    //t_list *struct ?
+void    walk(t_list *curent)
 {
     t_list **files;    
     t_list **queue;    
 
-    files = readDir(path);
-    queue = handleDir(files);   // returns struct and not string
+    files = readDir(((fileInfo *)curent->content)->path);
+    queue = handleDir(files);
     
     if (g_flag.R)
-        recurse(path, queue);   // pass struct and not queue + path
-    lstdel(queue, delStrings);  // lstdel files? That also include Queue ?
+    {
+        printf("\n%s:\n", ((fileInfo *)curent->content)->path); // Make into a macro?
+        lstIter(queue, walk);
+        // recurse(queue);
+    }
+    // lstdel(queue, delStrings); // Do a free on files First, then free the queue **
 }
 
-void    startWalk(t_list **dirs)
-{
-    // walk()
-    lstIter(dirs, printFile);
-}
 
 static void     initArgsStruct(seperated_arguments *tmp)
 {
@@ -160,19 +157,18 @@ static void     initArgsStruct(seperated_arguments *tmp)
 seperated_arguments seperateArgs(char **argv)
 {
     seperated_arguments splitArgs;
-    int                 n;
     struct stat         statInfo;
 
-    n = -1;
     initArgsStruct(&splitArgs);
-    while(argv[++n])
+    while(*argv)
     {
-       if ((lstat(argv[n], &statInfo)) < 0)
-            lstAddSorted(splitArgs.trash, newNode(strdup(argv[n])), stringByName);
+       if ((lstat(*argv, &statInfo)) < 0)
+            lstAddSorted(splitArgs.trash, newNode(strdup(*argv)), stringByName);
        else if (S_ISDIR(statInfo.st_mode))
-            addToListSorted(splitArgs.dirs, makeInfoStruct(NULL, argv[n]));
+            addToListSorted(splitArgs.dirs, makeInfoStruct(NULL, *argv));
        else
-            addToListSorted(splitArgs.files, makeInfoStruct(NULL, argv[n]));
+            addToListSorted(splitArgs.files, makeInfoStruct(NULL, *argv));
+        argv++;
     }
     return splitArgs;
 }
@@ -184,17 +180,10 @@ int main(int argc, char **argv)
 
     argv = parseArgs(argv);
     setFunctions();
-
     splitArgs = seperateArgs(argv);
 
-    // sortedArgs = sortArgs(argv); // Sort when seperate?? don't need this
-    // printShort(splitArgs.trash);
-    startWalk(splitArgs.dirs); // Don't Need this? just iter on main?
-    //convert arv into sorted linked list
-    // pass list to seperate lists
-    // print trash, reg, then startWalk();
-
-    // startWalk();
-    // walk("."); //with a struct info
+    // lstIter(splitArgs.trash, printShort2); 
+    // lstIter(splitArgs.file, printShort2);    function pointer to print
+    lstIter(splitArgs.dirs, walk);  //This shoud print the name if it's recursive?? and more than 1 arg?
 
 }
