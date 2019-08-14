@@ -42,5 +42,5 @@ char **parseArgs(char **args)
     args[0][0] = '.';
     args[0][1] = '\0';
     args[1] = NULL;
-    return NULL;
+    return args;
 }

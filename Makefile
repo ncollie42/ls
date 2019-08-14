@@ -5,6 +5,7 @@ delete.c \
 flags.c \
 file_make_print.c \
 path.c \
+structCreation.c \
 test_file2.c
 NAME = ls
 FLAGS = -g -fsanitize=address -Wall -Wextra

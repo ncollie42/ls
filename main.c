@@ -28,46 +28,46 @@ void    setFunctions(void)
         compare = byName;
 }
 
-fileInfo *makeInfoStruct(struct dirent *dirent)
+fileInfo *makeInfoStruct(char *path, char *name)
 {
     struct stat statInfo;
     struct passwd *pswd;
     struct group *grp;
     fileInfo *file;
 
-
-    lstat(dirent->d_name, &statInfo);
+    file = malloc(sizeof(fileInfo));
+    file->path = joinPath(path, name); //if g_flag l -> do all
+    file->link = getLink(file->path);
+    lstat(file->path, &statInfo);
     pswd = getpwuid(statInfo.st_uid);
     grp = getgrgid(statInfo.st_gid);
-
-    file = malloc(sizeof(fileInfo));
-    file->mode = statInfo.st_mode;
+    file->mode = statInfo.st_mode;  //function to make proper str
     file->nlink = statInfo.st_nlink;
-    file->pname = pswd->pw_name;
-    file->gname = grp->gr_name;
+    file->pname = strdup(pswd->pw_name);
+    file->gname = strdup(grp->gr_name);
     file->size = statInfo.st_size;
     file->block = statInfo.st_blocks;
-    file->time = ctime(&statInfo.st_mtimespec.tv_sec);
+    file->time = ctime(&statInfo.st_mtimespec.tv_sec); // function to make proper str
     file->seconds = statInfo.st_mtimespec.tv_sec;
     file->nano = statInfo.st_mtimespec.tv_nsec;
-    file->name = strdup(dirent->d_name);
+    file->name = strdup(name);
     return file;
 }
 
 
-t_list **readDir(char *dirname) {
+t_list **readDir(char *path) {
     DIR             *dir;
     struct dirent   *dirent;
     t_list          **head;
     t_list          *node;
 
     head = makeListHead();  //Make func to make and set to NULL? *newHead
-    dir = opendir(dirname);
+    dir = opendir(path);
     while ((dirent = readdir(dir)))
     {
         if (g_flag.a || dirent->d_name[0] != '.' )
         {
-            node = newNode(makeInfoStruct(dirent));
+            node = newNode(makeInfoStruct(path, dirent->d_name));
             lstAddSorted(head, node, compare);
         }
     }
@@ -131,35 +131,70 @@ void    recurse(char *curentPath, t_list **dirName)
     }
 }
 
-void    walk(char *path)
+void    walk(char *path)    //t_list *struct ?
 {
     t_list **files;    
     t_list **queue;    
 
     files = readDir(path);
-    queue = handleDir(files);
+    queue = handleDir(files);   // returns struct and not string
     
     if (g_flag.R)
-        recurse(path, queue);
-    lstdel(queue, delStrings);
+        recurse(path, queue);   // pass struct and not queue + path
+    lstdel(queue, delStrings);  // lstdel files? That also include Queue ?
 }
 
+void    startWalk(t_list **dirs)
+{
+    // walk()
+    lstIter(dirs, printFile);
+}
+
+static void     initArgsStruct(seperated_arguments *tmp)
+{
+    tmp->trash = makeListHead();
+    tmp->files = makeListHead();
+    tmp->dirs = makeListHead();
+}
+
+seperated_arguments seperateArgs(char **argv)
+{
+    seperated_arguments splitArgs;
+    int                 n;
+    struct stat         statInfo;
+
+    n = -1;
+    initArgsStruct(&splitArgs);
+    while(argv[++n])
+    {
+       if ((lstat(argv[n], &statInfo)) < 0)
+            lstAddSorted(splitArgs.trash, newNode(strdup(argv[n])), stringByName);
+       else if (S_ISDIR(statInfo.st_mode))
+            addToListSorted(splitArgs.dirs, makeInfoStruct(NULL, argv[n]));
+       else
+            addToListSorted(splitArgs.files, makeInfoStruct(NULL, argv[n]));
+    }
+    return splitArgs;
+}
 
 int main(int argc, char **argv)
 {
+    t_list  **sortedArgs;
+    seperated_arguments splitArgs;
+
     argv = parseArgs(argv);
     setFunctions();
 
-    walk(".");
+    splitArgs = seperateArgs(argv);
 
+    // sortedArgs = sortArgs(argv); // Sort when seperate?? don't need this
+    // printShort(splitArgs.trash);
+    startWalk(splitArgs.dirs); // Don't Need this? just iter on main?
+    //convert arv into sorted linked list
+    // pass list to seperate lists
+    // print trash, reg, then startWalk();
 
+    // startWalk();
+    // walk("."); //with a struct info
 
-    /*  print test function */
-    // printFiles(files);
-    // while(1);
-    // sort(argv);
-    // seperate_arguments splitArgs
-    // printTrash()
-    // printFiles()
-    // hanldeDirs(dirs);
 }

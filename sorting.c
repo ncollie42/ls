@@ -1,5 +1,15 @@
 #include "header.h"
 
+int stringByName(void *one, void *two)
+{
+    char *a;
+    char *b;
+    
+    a = (char *)((t_list *)one)->content;
+    b = (char *)((t_list *)two)->content;
+    return strcmp(a, b);
+}
+
 int byName(void *one, void *two)
 {
     fileInfo *a;

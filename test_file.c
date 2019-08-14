@@ -1,5 +1,6 @@
 #include <dirent.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/stat.h>
 #include <pwd.h>
 #include <grp.h>
@@ -7,6 +8,7 @@
 #include <sys/xattr.h>
 #include <strings.h>
 # include <sys/ioctl.h>
+#include <limits.h>
 #include <unistd.h> // getuid
 #define FLAG(x) flag[x - 'a']
 char flag[20];
@@ -38,13 +40,13 @@ int main(int argc, char **argv)
     time_t current_time = time(NULL);
     char    atributes[100];
     bzero(atributes, 100);
-    
+    printf("PATH MAX %d\n", PATH_MAX);
     // xattr -w nico best a -- xattr -w haha best a
     int x = listxattr("/tmp/a", atributes, 100, XATTR_NOFOLLOW);
     printf("%d %s %s\n",x, atributes, atributes + 5);
-
-    
-
+    char buff[300];
+    int size = readlink("./tmp/b", buff, 300);
+    printf("*********\nSize: %d\tBuff: %s\n", size, buff);
     printf("NOW TIME:\t%s", ctime(&current_time));
     printf("Mode\t\t\n");
     while ((dirent = readdir(test)))
@@ -66,7 +68,7 @@ int main(int argc, char **argv)
             printf("%s", time1);
             pswd = getpwuid(fileInfo.st_uid);
             // printf("%d\n", pswd. );
-
+            // free(pswd);
 
             // printf("name: %s\tino: %llu\ttype: %d ", dirent->d_name, dirent->d_ino, dirent->d_type);
             // printf("ino %llu\n", fileInfo.st_ino);

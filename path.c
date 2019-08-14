@@ -9,22 +9,24 @@ static void    move(char *dst, char *src)
         dst[n] = src[n];
 }
 
-char    *joinPath(char *s1, char *s2)
+char    *joinPath(char *path, char *name)
 {
     char    *new;
     int     size1;
     int     size2;
     int     total;
 
-    if (!s1 || !s2)
+    if (!name)
         return NULL;
-    size1 = nc_strlen(s1);
-    size2 = nc_strlen(s2);
+    if (!path)
+        return strdup(name);
+    size1 = nc_strlen(path);
+    size2 = nc_strlen(name);
     total = size1 + size2;
     new = malloc(sizeof(char) * (total + 2));
-    move(new, s1);
+    move(new, path);
     new[size1] = '/';
-    move(&new[size1+1],s2);
+    move(&new[size1+1],name);
     new[total + 1] = '\0';
     return new;
 }

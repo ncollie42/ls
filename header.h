@@ -13,24 +13,26 @@
 # include <sys/ioctl.h>
 #include <unistd.h> // getuid
 #include "nc_lib.h"
-
+#define PATH_MAX        4096
 typedef struct s_seperate_arguments
 {
-    t_list *trash;
-    t_list *dirs;
-    t_list *files;
+    t_list **trash;
+    t_list **dirs;
+    t_list **files;
 }seperated_arguments;
 
 typedef struct s_info
 {
-    int mode;
+    int mode;       //Make into char*?
     int nlink;
-    char *pname;
-    char *gname;
+    char *pname;    //free
+    char *gname;    //free
     long long int size;
     long long int block;
-    char *name;
-    char *time;
+    char *name; //free
+    char *time; //will have to be duped and freed
+    char *path; //free
+    char *link; // if it has link else NULL
     long seconds;
     int nano;
 }fileInfo;
@@ -53,6 +55,7 @@ int     byName(void *one, void *two);
 int     byNameRev(void *one, void *two);
 int     byTime(void *one, void *two);
 int     byTimeRev(void *one, void *two);
+int     stringByName(void *one, void *two);
 int     (*compare)(void*,void*);
 
 /* path */
@@ -61,7 +64,11 @@ char    *joinPath(char *s1, char *s2);
 
 /* deleting */
 
- void delStrings(void *str);
+void delStrings(void *str);
+
+/* Struct Info creation */
+
+char *getLink(char *path);
 
 /* Dirs */
 
@@ -83,6 +90,8 @@ enum Bool{FALSE, TRUE};
 flags g_flag;
 
 /* Test */
-void printFiles(t_list **head);
 
+void    printFiles(t_list **head);
+void    printFile(t_list *curent);
+void    addToListSorted(t_list **head, void *data);
 #endif
