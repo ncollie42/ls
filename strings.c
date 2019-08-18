@@ -30,7 +30,7 @@ char    *fileShortMake(t_list *file)
 	return buffer;
 }
 
-void    printLong(t_list **files)
+void    print(t_list **files)
 {
 	t_list *file;
 
@@ -39,17 +39,18 @@ void    printLong(t_list **files)
 	{
 		printf("%s\n", ((char *)file->content));
 		file = file->next;
-	}
+	}	
 }
 
-void    printShort(t_list **files)
+
+void    printTrash(t_list **files)
 {
 	t_list *file;
 
 	file = *files;
 	while(file)
 	{
-		printf("%s\n", ((char *)file->content));
+		printf("ls: %s: No such file or directory\n", ((char *)file->content));
 		file = file->next;
 	}	
 }

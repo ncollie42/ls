@@ -14,6 +14,7 @@
 #include <unistd.h> // getuid
 #include "nc_lib.h"
 #define PATH_MAX        4096
+
 typedef struct s_seperate_arguments
 {
     t_list **trash;
@@ -34,20 +35,17 @@ typedef struct s_info
     char *path; //free
     char *link; // if it has link else NULL
     long seconds;
-    int nano;
+    long nano;
 }fileInfo;
 
-void                setFunctions(void);
-seperated_arguments separateArgs(char **args);
 
 /* file Strings Make && print */
 
+char    *(*makeFileString)(t_list *file);
 char    *fileLongMake(t_list *file);
 char    *fileShortMake(t_list *file);
-char    *(*makeFileString)(t_list *file);
-void    printLong(t_list **files);
-void    printShort(t_list **files);
-void    (*printDir)(t_list **strings);
+void    print(t_list **files);
+
 
 /* Sorting */
 
@@ -65,14 +63,26 @@ char    *joinPath(char *s1, char *s2);
 /* deleting */
 
 void delStrings(void *str);
+void delFieInfoStruct(void *file);
 
 /* Struct Info creation */
 
 char *getLink(char *path);
 
+/* FileInfo */
+
+void        *copyFileInfoStruct(fileInfo *old);
+fileInfo    *makeInfoStruct(char *path, char *name);
+
 /* Dirs */
 
 void    walk(t_list *curent);
+void    printNWalk(t_list *curent);
+void    startWalk(t_list **curent);
+
+/* print */
+
+void        printTrash(t_list **files);
 
 /* flags */
 
@@ -89,8 +99,14 @@ enum Bool{FALSE, TRUE};
 
 flags g_flag;
 
+/* init */
+
+void                setFunctions(void);
+seperated_arguments separateArgs(char **argv);
+
 /* Test */
 
+void    print1(t_list *file);
 void    printFiles(t_list **head);
 void    printFile(t_list *curent);
 void    addToListSorted(t_list **head, void *data);

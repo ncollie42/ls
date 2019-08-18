@@ -2,10 +2,10 @@ CC = gcc
 FILES = main.c \
 sorting.c \
 delete.c \
-flags.c \
-file_make_print.c \
-path.c \
-structCreation.c \
+init.c \
+strings.c \
+struct_create.c \
+struct_path.c \
 test_file2.c
 NAME = ls
 FLAGS = -g -fsanitize=address -Wall -Wextra
