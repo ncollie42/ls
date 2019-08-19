@@ -1,3 +1,7 @@
-recreating terminal ls command in C
+Recreated the Unix ls comand
 
-Will be up within the next few days (today Auguest 5)
+This ls uses the standard lib located in /ncollie42/Lib
+
+For Makefile:
+
+export LIBRARY_PATH=/path/of/lib

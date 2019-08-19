@@ -14,6 +14,24 @@
 #include <unistd.h> // getuid
 #include "nc_lib.h"
 #define PATH_MAX        4096
+enum Bool{FALSE, TRUE};
+
+/* structs */
+
+    /* flags */
+
+typedef struct s_flags
+{
+    int a:1;
+    int l:1;
+    int r:1;
+    int t:1;
+    int R:1;
+}flags;
+
+flags g_flag;
+
+    /* to split arguments on main */
 
 typedef struct s_seperate_arguments
 {
@@ -22,30 +40,32 @@ typedef struct s_seperate_arguments
     t_list **files;
 }seperated_arguments;
 
+    /* FileInfo struct */
+
 typedef struct s_info
 {
-    int mode;       //Make into char*?
-    int nlink;
-    char *pname;    //free
-    char *gname;    //free
-    long long int size;
-    long long int block;
-    char *name; //free
-    char *time; //will have to be duped and freed
-    char *path; //free
-    char *link; // if it has link else NULL
-    long seconds;
-    long nano;
+    char            *mode;
+    char            *pname;
+    char            *gname;
+    char            *name;
+    char            *time;
+    char            *path;
+    char            *link;
+    long long int   size;
+    long long int   block;
+    int             nlink;
+    long            seconds;
+    long            nano;
 }fileInfo;
 
 
-/* file Strings Make && print */
+/* strings */
 
 char    *(*makeFileString)(t_list *file);
 char    *fileLongMake(t_list *file);
 char    *fileShortMake(t_list *file);
 void    print(t_list **files);
-
+void    printTrash(t_list **files);
 
 /* Sorting */
 
@@ -56,58 +76,49 @@ int     byTimeRev(void *one, void *two);
 int     stringByName(void *one, void *two);
 int     (*compare)(void*,void*);
 
-/* path */
 
-char    *joinPath(char *s1, char *s2);
 
 /* deleting */
 
-void delStrings(void *str);
-void delFieInfoStruct(void *file);
+void        delStrings(void *str);
+void        delFieInfoStruct(void *file);
 
 /* Struct Info creation */
 
 char *getLink(char *path);
 
-/* FileInfo */
+/* fileINfo Struct creation */
 
 void        *copyFileInfoStruct(fileInfo *old);
 fileInfo    *makeInfoStruct(char *path, char *name);
+        
+        /* mode & time */
 
-/* Dirs */
+char	*trimTime(char *ctime, long seconds);
+char    *mode(int num);
 
-void    walk(t_list *curent);
-void    printNWalk(t_list *curent);
+        /* path */
+
+char        *joinPath(char *s1, char *s2);
+
+/* Walk */
+
 void    startWalk(t_list **curent);
+void    walk(t_list *curent);
 
-/* print */
-
-void        printTrash(t_list **files);
-
-/* flags */
-
-char **parseArgs(char **args);
-typedef struct s_flags
-{
-    int a:1;
-    int l:1;
-    int r:1;
-    int t:1;
-    int R:1;
-}flags;
-enum Bool{FALSE, TRUE};
-
-flags g_flag;
 
 /* init */
 
+char                **parseArgs(char **args);
 void                setFunctions(void);
 seperated_arguments separateArgs(char **argv);
 
-/* Test */
+/* main */
 
-void    print1(t_list *file);
-void    printFiles(t_list **head);
-void    printFile(t_list *curent);
+t_list **handleDir(t_list **files);
+
+/* wrapper */
+
 void    addToListSorted(t_list **head, void *data);
+
 #endif

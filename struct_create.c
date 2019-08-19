@@ -7,7 +7,7 @@ void    *copyFileInfoStruct(fileInfo *old)
     file = malloc(sizeof(fileInfo));
     file->path = strdup(old->path);
     file->link = strdup(old->link);
-    file->mode = old->mode;
+    file->mode = strdup(old->mode);
     file->nlink = old->nlink;
     file->pname = strdup(old->pname);
     file->gname = strdup(old->gname);
@@ -34,15 +34,15 @@ fileInfo *makeInfoStruct(char *path, char *name)
     lstat(file->path, &statInfo);
     pswd = getpwuid(statInfo.st_uid);
     grp = getgrgid(statInfo.st_gid);
-    file->mode = statInfo.st_mode;  //function to make proper str
+    file->mode = mode(statInfo.st_mode);
     file->nlink = statInfo.st_nlink;
     file->pname = strdup(pswd->pw_name);
     file->gname = strdup(grp->gr_name);
     file->size = statInfo.st_size;
     file->block = statInfo.st_blocks;
-    file->time = ctime(&statInfo.st_mtimespec.tv_sec); // function to make proper str
     file->seconds = statInfo.st_mtimespec.tv_sec;
     file->nano = statInfo.st_mtimespec.tv_nsec;
+    file->time = trimTime(ctime(&statInfo.st_mtimespec.tv_sec), file->seconds);
     file->name = strdup(name);
     return file;
 }

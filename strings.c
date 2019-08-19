@@ -9,7 +9,7 @@ char    *fileLongMake(t_list *file)
 
 	buffer = nc_malloc(BUFF_SIZE);	
 	f = file->content;
-	sprintf(buffer, "%d  %2d %5s %5s %lld %s %s %s",
+	sprintf(buffer, "%s  %2d %5s %5s %lld %s %s %s",
 		f->mode,
 		f->nlink,
 		f->pname,
@@ -17,7 +17,7 @@ char    *fileLongMake(t_list *file)
 		f->size,
 		f->time,
 		f->name,
-		"link");
+		f->link);
     return buffer;
 }
 
