@@ -1,8 +1,7 @@
 #ifndef HEADER_H
 #define HEADER_H
 #include <stdio.h> // printf
-#include <stdlib.h> // NULL
-// #include "nc_lib_buffer.h"
+#include <stdlib.h> 
 #include <dirent.h>
 #include <sys/stat.h>
 #include <pwd.h>
@@ -11,12 +10,17 @@
 #include <sys/xattr.h>
 #include <strings.h>
 # include <sys/ioctl.h>
-#include <unistd.h> // getuid
+#include <unistd.h> 
 #include "nc_lib.h"
-#define PATH_MAX        4096
-enum Bool{FALSE, TRUE};
 
-/* structs */
+enum Bool{FALSE, TRUE};
+#define PATH_MAX        4096
+#define RESET   "\033[0m"
+#define ISDIR(x) ((((fileInfo *)(x)->content)->mode)[0] == 'd')
+#define GETBLOCKS(x) ((fileInfo *)(x)->content)->block
+#define GETPATH(x) ((fileInfo *)(x)->content)->path
+#define GETNAME(x) ((fileInfo *)(x)->content)->name
+#define HASNEXT(x) ((fileInfo *)(x)->next)
 
     /* flags */
 
@@ -56,6 +60,7 @@ typedef struct s_info
     int             nlink;
     long            seconds;
     long            nano;
+    char            *color;
 }fileInfo;
 
 
@@ -95,7 +100,7 @@ fileInfo    *makeInfoStruct(char *path, char *name);
         /* mode & time */
 
 char	*trimTime(char *ctime, long seconds);
-char    *mode(int num);
+char    *mode(int num, char **color);
 
         /* path */
 

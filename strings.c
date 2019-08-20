@@ -1,5 +1,6 @@
 #include "header.h"
 #include <stdio.h>
+
 #define BUFF_SIZE 500 // Should be big enough
 
 char    *fileLongMake(t_list *file)
@@ -9,14 +10,14 @@ char    *fileLongMake(t_list *file)
 
 	buffer = nc_malloc(BUFF_SIZE);	
 	f = file->content;
-	sprintf(buffer, "%s  %2d %5s %5s %lld %s %s %s",
+	sprintf(buffer, "%s  %2d %5s %5s %lld %s %s%s%s %s",
 		f->mode,
 		f->nlink,
 		f->pname,
 		f->gname,
 		f->size,
 		f->time,
-		f->name,
+		f->color, f->name, RESET,
 		f->link);
     return buffer;
 }
@@ -24,9 +25,11 @@ char    *fileLongMake(t_list *file)
 char    *fileShortMake(t_list *file)
 {
 	char *buffer;
+	fileInfo *f;
 
+	f = file->content;
 	buffer = nc_malloc(BUFF_SIZE);
-    sprintf(buffer, "%s", ((char *)((fileInfo *)file->content)->name));
+    sprintf(buffer, "%s%s%s", f->color, f->name, RESET);
 	return buffer;
 }
 

@@ -1,24 +1,33 @@
 #include "header.h"
 
-static void    set_type(char *mode, int num)
+enum Color{RED, GREEN, YELLOW, BLUE, PURPLE, REG};
+char *colors[] = {"\033[0;31m", "\033[0;32m", "\033[1;33m", "\033[0;34m",  "\033[0;35m", "\033[0m"};
+
+void setModeNColor(char *mode, char c, char **color, int index)
 {
-    if (S_ISREG(num))
-        mode[0] = '-';
-	else if (S_ISDIR(num))
-		mode[0] = 'd';
-	else if (S_ISBLK(num))
-		mode[0] = 'b';
-	else if (S_ISCHR(num))
-		mode[0] = 'c';
-	else if (S_ISLNK(num))
-		mode[0] = 'l';
-	else if (S_ISSOCK(num))
-		mode[0] = 's';
-	else if (S_ISFIFO(num))
-		mode[0] = 'P';
+	mode[0] = c;
+	*color = colors[index];
 }
 
-static void    set_mode(char *mode, int num)
+static void    set_type(char *mode, int num, char **color)
+{
+    if (S_ISREG(num))
+        setModeNColor(mode, '-', color, (mode[3] == 'x') ? RED : REG);
+	else if (S_ISDIR(num))
+        setModeNColor(mode, 'd', color, BLUE);
+	else if (S_ISBLK(num))
+        setModeNColor(mode, 'b', color, GREEN);
+	else if (S_ISCHR(num))
+        setModeNColor(mode, 'c', color, YELLOW);
+	else if (S_ISLNK(num))
+        setModeNColor(mode, 'l', color, PURPLE);
+	else if (S_ISSOCK(num))
+        setModeNColor(mode, 's', color, REG);
+	else if (S_ISFIFO(num))
+        setModeNColor(mode, 'P', color, REG);
+}
+
+static void    set_mode(char *mode, int num, char **color)
 {
     int n;
 
@@ -44,15 +53,16 @@ static void    extra_modes(char *mode, int num)
 		mode[9] = (mode[9] == '-') ? 'T' : 't';
 }
 
-char    *mode(int num) {
+char    *mode(int num, char **color) 
+{
     char    *mode;
     int     n;
     
     n = 0;
     if (!(mode = malloc(sizeof(char) * 11)))
 		return (NULL);
-    set_type(mode, num);
-    set_mode(mode, num);
+    set_mode(mode, num, color);
+    set_type(mode, num, color);
     extra_modes(mode, num);
     //Add extended @ + here
     mode[10] = '\0';

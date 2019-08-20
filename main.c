@@ -1,9 +1,5 @@
 #include "header.h"
 
-#define ISDIR(x) ((((fileInfo *)(x)->content)->mode)[0] == 'd')
-#define GETBLOCKS(x) ((fileInfo *)(x)->content)->block
-#define GETNAME(x) ((fileInfo *)(x)->content)->name
-
 extern flags g_flag;
 
 /* 
@@ -22,7 +18,7 @@ static int isDots(t_list *file)
 {
     char *name;
 
-    name = ((fileInfo *)file->content)->name;
+    name = GETNAME(file);
     if (!strcmp(name, ".") || !strcmp(name, ".."))
         return TRUE;
     return FALSE;
@@ -87,5 +83,8 @@ int main(int argc, char **argv)
 
 /*
     Todo:
-        print reg
+        * print reg formating
+        * better spacing on -l
+        * ALC @ +
+        * more flags
 */

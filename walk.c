@@ -1,6 +1,6 @@
 #include "header.h"
 
-static t_list **readDir(char *path) {
+static t_list **readDir(char *path, char *name) {
     DIR             *dir;
     struct dirent   *dirent;
     t_list          **head;
@@ -9,7 +9,7 @@ static t_list **readDir(char *path) {
     dir = opendir(path);
     if (!dir)
     {
-        printf("ls: %s: Permission denied\n", path);
+        printf("ls: %s: Permission denied\n", name); 
         return NULL;
     }
     while ((dirent = readdir(dir)))
@@ -23,7 +23,7 @@ static t_list **readDir(char *path) {
 
 static void    printNWalk(t_list *curent)
 {
-    printf("\n%s:\n", ((fileInfo *)curent->content)->path);
+    printf("\n%s:\n", GETPATH(curent));
     walk(curent);
 }
 
@@ -34,10 +34,10 @@ void    startWalk(t_list **dirs)
     dir = *dirs;
     if (dir)
     {
-        if (((fileInfo *)dir->next))
-            printf("%s:\n", ((fileInfo *)dir->content)->path); 
+        if (HASNEXT(dir))
+            printf("%s:\n", GETPATH(dir)); 
         walk(dir);
-        if ((fileInfo *)dir->next)
+        if (HASNEXT(dir))
             lstIter(&dir->next, printNWalk);
     }
 }
@@ -47,7 +47,7 @@ void    walk(t_list *curent)
     t_list **files;    
     t_list **queue;    
 
-    files = readDir(((fileInfo *)curent->content)->path);   //Pass a pointer to the struct so i cant print name if it doesn't work.
+    files = readDir(GETPATH(curent), GETNAME(curent));
     if (!files)
     {
         lstdel(files, delFieInfoStruct);

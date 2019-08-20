@@ -34,7 +34,7 @@ fileInfo *makeInfoStruct(char *path, char *name)
     lstat(file->path, &statInfo);
     pswd = getpwuid(statInfo.st_uid);
     grp = getgrgid(statInfo.st_gid);
-    file->mode = mode(statInfo.st_mode);
+    file->mode = mode(statInfo.st_mode, &file->color);
     file->nlink = statInfo.st_nlink;
     file->pname = strdup(pswd->pw_name);
     file->gname = strdup(grp->gr_name);
