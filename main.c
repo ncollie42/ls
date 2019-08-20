@@ -56,7 +56,7 @@ t_list **handleDir(t_list **files)
         total += GETBLOCKS(file);
         append(strings, newNode(makeFileString(file)));
         if (g_flag.R && ISDIR(file) && !isDots(file))
-            append(queue, newNode(copyFileInfoStruct((fileInfo *)file->content)));
+            append(queue, newNode(copyFileInfoStruct((fileInfo *)file->content))); // Use a bit marker to check if a file has already been freed.
         file = file->next;
     }
     if (g_flag.l)

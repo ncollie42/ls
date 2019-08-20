@@ -6,17 +6,11 @@ extern flags g_flag;
 
 void    setFunctions(void)
 {
-    if (g_flag.l)
-        makeFileString = fileLongMake;
-    else
-        makeFileString = fileShortMake;
-    if (g_flag.r)
-    {
-        if (g_flag.t)
-            compare = byTimeRev;
-        else
-            compare = byNameRev;
-    }
+    makeFileString = (g_flag.l) ? fileLongMake : fileShortMake;
+    if (g_flag.r && g_flag.t)  // Dispatch table for functions?
+        compare = byTimeRev;
+    else if (g_flag.r)
+        compare = byNameRev;
     else if (g_flag.t)
         compare = byTime;
     else
